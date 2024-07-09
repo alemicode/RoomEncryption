@@ -14,12 +14,12 @@ class MainViewModel : ViewModel() {
     private val userSettingsDao = DatabaseProvider.db.userSettingsDao()
     private val _uiState = MutableStateFlow(UserSettingsUiState())
     val uiState: StateFlow<UserSettingsUiState> = _uiState.asStateFlow()
-
+    val cipherManagerImpl  = CipherManagerImpl()
 
     fun saveUserSettings(username: String, password: String) {
         viewModelScope.launch {
-            val encryptedUsername = CryptoUtils.encrypt(username)
-            val encryptedPassword = CryptoUtils.encrypt(password)
+            val encryptedUsername = cipherManagerImpl.encrypt(username)
+            val encryptedPassword = cipherManagerImpl.encrypt(password)
 
             userSettingsDao.insert(
                 UserSettingsEntity(
@@ -43,8 +43,8 @@ class MainViewModel : ViewModel() {
             userSettings
             if (userSettings != null) {
 
-                val decryptedUsername = CryptoUtils.decrypt(userSettings.username)
-                val decryptedPassword = CryptoUtils.decrypt(userSettings.password)
+                val decryptedUsername = cipherManagerImpl.decrypt(userSettings.username)
+                val decryptedPassword = cipherManagerImpl.decrypt(userSettings.password)
 
                 _uiState.value = _uiState.value.copy(
                     username = decryptedUsername,
